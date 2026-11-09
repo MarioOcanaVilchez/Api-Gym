@@ -1,5 +1,5 @@
 import { loadDB,saveToDatabase,createWorkout,deleteWorkout as eliminarWorkout, updateWorkout } from "../database/ficheros";
-import { Filtros, Workout } from "../types/workout";
+import { FiltrosWorkout, Workout } from "../types/workout";
 import {v4 as uuid} from "uuid";
 import { toHttpError } from "../utils/httpError";
 

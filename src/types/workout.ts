@@ -14,7 +14,7 @@ export interface WorkoutRecord{
     workout:string,
     record:string,
     memberId?:string,
-    member?:Miembro
+    member?:string
 }
 export interface Miembro{
     id:string,
@@ -29,10 +29,13 @@ export interface Database{
     members:Miembro[],
     records:WorkoutRecord[]
 }
-export interface Filtros{
+export interface FiltrosWorkout{
     mode:string,
     equipment:string,
     name:string,
     exercise:string,
     limit:string
+}
+export interface FiltrosRecord{
+    workout:string
 }

@@ -1,6 +1,6 @@
 import {readFileSync,writeFileSync} from 'fs';
 import path from 'path';
-import type{ Database, Workout} from '../types/workout';
+import type{ Database, Workout, WorkoutRecord} from '../types/workout';
 import { toHttpError } from '../utils/httpError';
 
 const DB_PATH:string = path.resolve(import.meta.dirname,"../../data/db.json");
@@ -17,10 +17,30 @@ export const createWorkout = (workout:Workout):boolean => {
         throw toHttpError(error);
     }
 }
+export const createRecord = (record:WorkoutRecord):boolean => {
+    try{
+    let database: Database = loadDB();
+    database.records.push(record);
+    saveToDatabase(database);
+    return true;
+    }catch(error){
+        throw toHttpError(error);
+    }
+}
 export const deleteWorkout = (id:string):boolean => {
     try{
     let database: Database = loadDB();
     database.workouts = database.workouts.filter((workout) => workout.id != id);
+    saveToDatabase(database);
+    return true;
+    }catch(error){
+        throw toHttpError(error);
+    }
+}
+export const deleteRecord = (id:string):boolean => {
+    try{
+    let database: Database = loadDB();
+    database.records = database.records.filter((record) => record.id != id);
     saveToDatabase(database);
     return true;
     }catch(error){
@@ -32,6 +52,17 @@ export const updateWorkout = (workout:Workout):boolean => {
     let database: Database = loadDB();
     database.workouts = database.workouts.filter((workoutLista) => workout.id != workoutLista.id);
     database.workouts.push(workout);
+    saveToDatabase(database);
+    return true;
+    }catch(error){
+        throw toHttpError(error);
+    }
+}
+export const updateRecord = (record:WorkoutRecord):boolean => {
+    try{
+    let database: Database = loadDB();
+    database.records = database.records.filter((recordLista) => record.id != recordLista.id);
+    database.records.push(record);
     saveToDatabase(database);
     return true;
     }catch(error){
