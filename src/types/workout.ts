@@ -34,8 +34,13 @@ export interface FiltrosWorkout{
     equipment:string,
     name:string,
     exercise:string,
-    limit:string
+    limit:string,
+    apiKey:string
 }
 export interface FiltrosRecord{
-    workout:string
+    workout:string,
+    apiKey:string
+}
+export interface FiltrosMember{
+    apiKey:string
 }
