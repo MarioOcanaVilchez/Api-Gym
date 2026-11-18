@@ -29,7 +29,7 @@ API RESTful desarrollada con **Node.js**, **Express 5** y **TypeScript** para la
 3. **Configurar variables de entorno:**
    Crea un archivo `src/config/.env` a partir de `src/config/.env.example`:
    ```env
-   PORT=3024
+   PORT=3002
    ```
 
 4. **Iniciar el servidor en modo desarrollo:**
@@ -43,8 +43,8 @@ API RESTful desarrollada con **Node.js**, **Express 5** y **TypeScript** para la
 
 Con el servidor en marcha, puedes consultar y probar todos los endpoints desde el navegador en:
 
-- **Swagger UI:** `http://localhost:3024/api/v1/docs`
-- **Especificación JSON:** `http://localhost:3024/api/v1/docs.json`
+- **Swagger UI:** `http://localhost:3002/api/v1/docs`
+- **Especificación JSON:** `http://localhost:3002/api/v1/docs.json`
 
 ---
 
