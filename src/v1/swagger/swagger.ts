@@ -8,11 +8,12 @@ import { Express } from "express";
  * @param port - Puerto donde corre el servidor
  */
 const swaggerDocs = (app: Express, port: number): void => {
+  const serverUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`;
   const options = {
     definition: {
       openapi: "3.0.0",
       info: { title: "Crossfit WOD API", version: "1.0.0" },
-      servers: [{ url: `http://localhost:${port}` }],
+      servers: [{ url: serverUrl }],
     },
     apis: ["src/controller/controller.ts", "src/types/workout.ts"],
   } as const;

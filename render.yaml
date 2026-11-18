@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: apirestgym
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_CONNECT_STRING
+        sync: false

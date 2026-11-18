@@ -1,14 +1,14 @@
-import { loadDB,saveToDatabase,createWorkout,deleteWorkout as eliminarWorkout, updateWorkout } from "../database/ficheros";
+import { getMembers, getMember as getMemberBD } from "../database/oracle";
 import { toHttpError } from "../utils/httpError";
 
 
-export function getAllMembers(){
-    return loadDB().members;
+export async function getAllMembers(){
+    return await getMembers();
 }
 
-export function getMember(id:string){
+export async function getMember(id:string){
     try{
-    return loadDB().members.find((member) => member.id == id) ?? null;
+    return await getMemberBD(id);
     }catch(error){
         throw toHttpError(error);
     }

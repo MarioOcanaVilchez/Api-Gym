@@ -3,4 +3,5 @@ dist/
 .env
 src/config/.env
 *.log
+npm-debug.log*
 .DS_Store

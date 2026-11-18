@@ -226,7 +226,7 @@ export function getApiKey(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function getAllWorkouts(request:Request,response:Response){
+export async function getAllWorkouts(request:Request,response:Response){
     const {mode} = request.query;
     const {equipment} = request.query;
     const {name} = request.query;
@@ -238,7 +238,7 @@ export function getAllWorkouts(request:Request,response:Response){
         status: 'fail',
         data: 'no autorizado'
         });
-    let workouts:Workout[] = workoutService.getAllWorkouts();
+    let workouts:Workout[] = await workoutService.getAllWorkouts();
     if (filtros.name != undefined) workouts = workouts.filter((workout) => workout.name.includes(filtros.name));
     if (filtros.mode != undefined) workouts = workouts.filter((workout) => workout.mode.toLowerCase() == filtros.mode.toLowerCase());
     if (filtros.equipment != undefined ) workouts =  workouts.filter((workout) => workout.equipment.some((equipment) => equipment == filtros.equipment));
@@ -300,14 +300,14 @@ export function getAllWorkouts(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function getAllMembers(request:Request,response:Response){
+export async function getAllMembers(request:Request,response:Response){
     const {apiKey} = request.query;
     let filtros:FiltrosMember = {apiKey} as FiltrosMember;
     if (filtros.apiKey != 'mario') response.status(400).send({
         status: 'fail',
         data: 'no autorizado'
         });
-    let members:Miembro[] = memberService.getAllMembers();
+    let members:Miembro[] = await memberService.getAllMembers();
     response.send({
     status: 'ok',
     data: members
@@ -360,7 +360,7 @@ export function getAllMembers(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function getAllRecords(request:Request,response:Response){
+export async function getAllRecords(request:Request,response:Response){
     const {apiKey} = request.query;
     const {workout} = request.query;
     let filtros:FiltrosRecord = {workout,apiKey} as FiltrosRecord;
@@ -368,7 +368,7 @@ export function getAllRecords(request:Request,response:Response){
         status: 'fail',
         data: 'no autorizado'
         });
-    let records:WorkoutRecord[] = recordService.getAllRecords();
+    let records:WorkoutRecord[] = await recordService.getAllRecords();
     if (filtros.workout != undefined) records = records.filter((record) => record.workout == filtros.workout);
     if (records.length == 0) response.status(404).send({
         status: 'fail',
@@ -419,7 +419,7 @@ export function getAllRecords(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function getWorkouts(request:Request,response:Response){
+export async function getWorkouts(request:Request,response:Response){
     const {apiKey} = request.query;
     const id = request.params.id;
     let filtros:FiltrosWorkout = {apiKey} as FiltrosWorkout;
@@ -433,11 +433,20 @@ export function getWorkouts(request:Request,response:Response){
             data: 'Bad request'
         });
     }else {
+        let workout = await workoutService.getWorkout(id.toString());
+        if (workout != null) {
         response.send({
             status:200,
-            data: workoutService.getWorkout(id.toString())
+            data: workout
+        });
+    } else {
+        response.send({
+            status:404,
+            data: 'Workout no encontrado'
         });
     }
+    }
+    
 }
 
 /**
@@ -479,7 +488,7 @@ export function getWorkouts(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function getMember(request:Request,response:Response){
+export async function getMember(request:Request,response:Response){
     const {apiKey} = request.query;
     const id = request.params.id;
     let filtros:FiltrosMember = {apiKey} as FiltrosMember;
@@ -493,10 +502,18 @@ export function getMember(request:Request,response:Response){
             data: 'Bad request'
         });
     }else {
+        let member:Miembro | null = await memberService.getMember(id.toString());
+        if (member != null){
         response.send({
             status:200,
-            data: memberService.getMember(id.toString())
+            data: member
         });
+    } else {
+        response.send({
+            status:404,
+            message: 'Miembro no existente'
+        });
+    }
     }
 }
 
@@ -539,7 +556,7 @@ export function getMember(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function getRecord(request:Request,response:Response){
+export async function getRecord(request:Request,response:Response){
     const {apiKey} = request.query;
     const id = request.params.id;
     let filtros:FiltrosRecord = {apiKey} as FiltrosRecord;
@@ -553,10 +570,18 @@ export function getRecord(request:Request,response:Response){
             data: 'Bad request'
         });
     }else {
+        let record:WorkoutRecord | null = await recordService.getRecord(id.toString());
+        if (record != null){
         response.send({
             status:200,
-            data: recordService.getRecord(id.toString())
+            data: record
         });
+        } else {
+            response.send({
+                status:404,
+                message: 'Record no existente'
+            });
+        }
     }
 }
 
@@ -620,7 +645,7 @@ export function getRecord(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function postWorkout(request:Request,response:Response){
+export async function postWorkout(request:Request,response:Response){
     const body:Workout = request.body ?? {};
     if (body.name == null || body.exercises == null ||  body.equipment == null || body.mode == null || body.trainerTips == null) {
         response.status(400).send({
@@ -630,7 +655,7 @@ export function postWorkout(request:Request,response:Response){
     } else {
     response.status(201).send({
         status: 'ok',
-        data: workoutService.postWorkout(body)
+        data: await workoutService.postWorkout(body)
     });
 }
 }
@@ -680,7 +705,7 @@ export function postWorkout(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function postRecord(request:Request,response:Response){
+export async function postRecord(request:Request,response:Response){
     const body:WorkoutRecord = request.body ?? {};
     if (body.workout == null || body.record == null) {
         response.status(400).send({
@@ -690,7 +715,7 @@ export function postRecord(request:Request,response:Response){
     } else {
     response.status(201).send({
         status: 'ok',
-        data: recordService.postRecord(body)
+        data: await recordService.postRecord(body)
     });
 }
 }
@@ -751,7 +776,7 @@ export function postRecord(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function patchWorkout(request:Request,response:Response){
+export async function patchWorkout(request:Request,response:Response){
     const id = request.params.id;
     if (id == undefined){
         response.status(400).send({
@@ -765,12 +790,19 @@ export function patchWorkout(request:Request,response:Response){
             status: 'fail',
             data: 'Bad request'
             });
-        } else {
+        } else{
             body.id = id.toString();
-            response.status(201).send({
+            if (await workoutService.patchWorkout(body)){
+                response.status(201).send({
                 status: 'ok',
-                data: workoutService.patchWorkout(body)
+                data: true
             });
+            } else {
+                response.status(404).send({
+            status: 'fail',
+            data: 'Workout no encontrado'
+            });
+            }
         }
     }
 }
@@ -823,7 +855,7 @@ export function patchWorkout(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function patchRecord(request:Request,response:Response){
+export async function patchRecord(request:Request,response:Response){
     const id = request.params.id;
     if (id == undefined){
         response.status(400).send({
@@ -839,10 +871,17 @@ export function patchRecord(request:Request,response:Response){
             });
         } else {
             body.id = id.toString();
-            response.status(201).send({
+            if (await recordService.patchRecord(body)){
+                response.status(201).send({
                 status: 'ok',
-                data: recordService.patchRecord(body)
+                data: true
             });
+            } else {
+                response.status(404).send({
+                status: 'ok',
+                message: 'Record no encontrado'
+            });
+            }
         }
     }
 }
@@ -881,7 +920,7 @@ export function patchRecord(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function deleteWorkout(request:Request,response:Response){
+export async function deleteWorkout(request:Request,response:Response){
     const id = request.params.id;
     if (id == undefined){
         response.status(400).send({
@@ -891,7 +930,7 @@ export function deleteWorkout(request:Request,response:Response){
     } else{
         response.send({
             status:200,
-            data: workoutService.deleteWorkout(id.toString())
+            data: await workoutService.deleteWorkout(id.toString())
         });
     }
 }
@@ -929,7 +968,7 @@ export function deleteWorkout(request:Request,response:Response){
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-export function deleteRecord(request:Request,response:Response){
+export async function deleteRecord(request:Request,response:Response){
     const id = request.params.id;
     if (id == undefined){
         response.status(400).send({
@@ -939,7 +978,7 @@ export function deleteRecord(request:Request,response:Response){
     } else{
         response.send({
             status:200,
-            data: recordService.deleteRecord(id.toString())
+            data: await recordService.deleteRecord(id.toString())
         });
     }
 }
